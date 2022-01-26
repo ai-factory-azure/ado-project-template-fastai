@@ -1,0 +1,13 @@
+name: mnist-training
+channels:
+  - defaults
+  - anaconda
+  - conda-forge
+dependencies:
+  - python=3.7.5
+  - pip
+  - pip:
+    - azureml-mlflow
+    - azureml-sdk
+    - fastai #==1.0.61
+    - mlflow

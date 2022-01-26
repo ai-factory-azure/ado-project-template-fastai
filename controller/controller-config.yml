@@ -1,0 +1,108 @@
+variables:
+
+# Workspace settings
+  ml_workspace_connection: Azure-ARM-Dev
+  ml_workspace_name: main
+  ml_workspace_rg: azureml-examples-rg
+
+# Training Dataset settings
+  training_dataset_name: mnist-tiny
+  training_dataset_description: mnist
+  training_dataset_local_path: code/data/train
+  training_dataset_path_on_datastore: data/
+  training_dataset_type: cloud
+  training_dataset_storage_url: 'https://azureaidemostorage.blob.core.windows.net/data/train/'
+
+# Scoring Dataset settings
+  scoring_dataset_name: mnist-batch-input
+  scoring_dataset_description: mnist
+  scoring_dataset_local_path: code/data/batch
+  scoring_dataset_path_on_datastore: data/
+  scoring_dataset_type: cloud
+  scoring_dataset_storage_url: 'https://azureaidemostorage.blob.core.windows.net/data/score/'
+
+# Training pipeline settings
+
+  # Training AzureML Environment name
+  training_environment_name: mnist-training
+
+  # Training AzureML Environment conda yaml
+  training_environment_conda_yaml: controller/environments/train.yml
+
+  # Name for the training pipeline
+  training_pipeline_name: mnist-training
+
+  # Compute target for pipeline
+  training_pipeline_target: cpu-cluster
+  training_pipeline_target_min_nodes: 0
+  training_pipeline_target_max_nodes: 4
+  # Command to run for training, use azureml:dataset_name:version to reference a dataset
+  # training_command: 'train.py --epochs 5 --data_path data/'
+  training_command: 'train.py --epochs 1 --data_path azureml:mnist-tiny:1'
+  # Name under which the model will be registered
+  model_name: mnist-ci
+
+# Batch pipeline settings
+
+  # Batch AzureML Environment name
+  batch_environment_name: mnist-batch
+
+  # Batch AzureML Environment conda yaml
+  batch_environment_conda_yaml: controller/environments/batch.yml
+
+  # Name for the batch scoring pipeline
+  batch_pipeline_name: mnist-batch-scoring
+
+  # Compute target for pipeline
+  batch_pipeline_target: cpu-cluster
+  batch_pipeline_target_min_nodes: 0
+  batch_pipeline_target_max_nodes: 4
+
+  # Input batch dataset
+  batch_input_dataset_name: mnist-batch-input
+
+  # Output dataset with results
+  batch_output_dataset_name: mnist-batch-output
+  batch_output_path_on_datastore: mnist-batch-scoring-results/{run-id}
+  batch_output_filename: results.txt
+
+  # Model used for batch scoring
+  #model_name: mnist-simple-ci
+
+  # Parallelization settings
+  batch_mini_batch_size: 8
+  batch_error_threshold: 1
+  batch_process_count_per_node: 1
+  batch_node_count: 1
+
+# Real-time deployment settings
+
+  # Inference AzureML Environment name
+  inference_environment_name: mnist-inference
+
+  # Inference AzureML Environment conda yaml
+  inference_environment_conda_yaml: controller/environments/inference.yml
+
+  # Deployment target for model (must be an in-AzureML existing AKS cluster)
+  inference_aks_target: aks-mnist
+
+  # Deployment replica scale
+  inference_autoscale_min_replicas: 1
+  inference_autoscale_max_replicas: 3
+
+  # Deployment resources per replica
+  inference_cpu_cores_per_replica: 1
+  inference_memory_gb_per_replica: 0.5
+
+  # Collect model telemetry using App Insights
+  inference_enable_app_insights: True
+
+  # Enable model data collection
+  inference_collect_model_data: True
+
+  # Script to run for inference, comes from src/ inside code repo
+  inference_script: score.py
+
+  # Name of the model endpoint deployment
+  inference_deployment_name: mnist-deployment
+  

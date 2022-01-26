@@ -1,0 +1,11 @@
+name: file-example
+channels:
+  - defaults
+  - anaconda
+  - conda-forge
+dependencies:
+  - python=3.7.5
+  - pip
+  - pip:
+    - azureml-mlflow
+    - fastai==2.4.1

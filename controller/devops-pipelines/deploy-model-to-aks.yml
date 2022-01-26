@@ -1,0 +1,39 @@
+variables:
+- template: ../controller-config.yml
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - controller/devops-pipelines/deploy-model-to-aks.yml
+
+pool:
+  vmImage: ubuntu-20.04
+
+resources:
+  repositories:
+    - repository: templates-mlops  # Template Repo
+      name: ai-factory/templates-mlops #change!
+      type: git
+
+stages:
+- stage: DeployModelAKS
+  displayName: Deploy Model to AKS
+  jobs:
+    - job: DeployModel
+      steps:
+      - checkout: self
+        path: s/
+      - checkout: templates-mlops
+        path: s/templates/
+      - template: templates/install-az-cli.yml@templates-mlops        
+      - template: templates/install-aml-cli.yml@templates-mlops
+      - template: templates/connect-to-workspace.yml@templates-mlops
+      - template: templates/create-environment.yml@templates-mlops
+        parameters:
+          environment_name: $(inference_environment_name)
+          environment_conda_yaml: $(inference_environment_conda_yaml)
+      - template: templates/get-inference-cluster.yml@templates-mlops
+      - template: templates/deploy-model.yml@templates-mlops
